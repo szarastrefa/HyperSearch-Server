@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: hypersearch
+  labels:
+    name: hypersearch
+    environment: production
+    app.kubernetes.io/name: hypersearch
+    app.kubernetes.io/instance: hypersearch-prod
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: ai-platform
+    app.kubernetes.io/part-of: hypersearch-platform
+    app.kubernetes.io/managed-by: kubernetes

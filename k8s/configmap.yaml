@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hypersearch-config
+  namespace: hypersearch
+  labels:
+    app: hypersearch-server
+    component: config
+data:
+  # Application Configuration
+  FLASK_ENV: "production"
+  BACKEND_PORT: "5000"
+  FRONTEND_PORT: "3000"
+  HTTP_PORT: "80"
+  
+  # Database Configuration
+  POSTGRES_DB: "hypersearch"
+  POSTGRES_USER: "hypersearch"
+  POSTGRES_HOST: "hypersearch-postgres"
+  POSTGRES_PORT: "5432"
+  
+  # Vector Database
+  QDRANT_URL: "http://hypersearch-qdrant:6333"
+  QDRANT_HOST: "hypersearch-qdrant"
+  QDRANT_PORT: "6333"
+  
+  # Redis Cache
+  REDIS_URL: "redis://hypersearch-redis:6379"
+  REDIS_HOST: "hypersearch-redis"
+  REDIS_PORT: "6379"
+  
+  # Features
+  ENABLE_COGNITIVE_AGENTS: "true"
+  ENABLE_MULTIMODAL: "true"
+  ENABLE_AUTONOMOUS_DECISIONS: "true"
+  ENABLE_ENTERPRISE_FEATURES: "true"
+  ENABLE_HIGH_AVAILABILITY: "true"
+  
+  # Security
+  ENABLE_LDAP_AUTH: "true"
+  ENABLE_SAML_AUTH: "true"
+  ENABLE_OAUTH2: "true"
+  SECURE_COOKIES: "true"
+  FORCE_HTTPS: "true"
+  
+  # High Availability
+  REPLICA_COUNT: "3"
+  MIN_READY_SECONDS: "30"
+  MAX_UNAVAILABLE: "1"
+  MAX_SURGE: "1"
