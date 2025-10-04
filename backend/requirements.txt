@@ -1,0 +1,126 @@
+# HyperSearch AI Platform - Python Dependencies
+# Enterprise-grade AI search platform requirements
+
+# Web Framework
+Flask==3.0.0
+Flask-CORS==4.0.0
+Flask-Limiter==3.5.0
+Flask-Babel==4.0.0
+Werkzeug==3.0.1
+Gunicorn==21.2.0
+
+# AI/ML Libraries
+openai==1.3.5
+anthropic==0.8.1
+google-generativeai==0.3.2
+huggingface-hub==0.19.4
+transformers==4.36.2
+torch==2.1.2
+numpy==1.24.4
+scipy==1.11.4
+scikit-learn==1.3.2
+
+# Vector Database & Search
+qdrant-client==1.7.0
+faiss-cpu==1.7.4
+sentence-transformers==2.2.2
+elasticsearch==8.11.1
+whoosh==2.7.4
+
+# Database Connectors
+psycopg2-binary==2.9.9
+redis==5.0.1
+SQLAlchemy==2.0.23
+alembic==1.13.1
+
+# Enterprise Authentication
+ldap3==2.9.1
+pysaml2==7.4.2
+authlib==1.2.1
+PyJWT==2.8.0
+cryptography==41.0.8
+
+# Monitoring & Observability
+prometheus-client==0.19.0
+opentelemetry-api==1.21.0
+opentelemetry-sdk==1.21.0
+opentelemetry-instrumentation-flask==0.42b0
+structlog==23.2.0
+
+# HTTP & API
+requests==2.31.0
+httpx==0.25.2
+celery==5.3.4
+
+# Data Processing
+pandas==2.1.4
+Pillow==10.1.0
+opencv-python==4.8.1.78
+pydub==0.25.1
+PyPDF2==3.0.1
+python-docx==1.1.0
+
+# Configuration & Environment
+python-dotenv==1.0.0
+pyyaml==6.0.1
+click==8.1.7
+marshmallow==3.20.2
+
+# Utilities
+requests-cache==1.1.1
+retrying==1.3.4
+dateutils==0.6.12
+fuzzy==1.2.2
+unidecode==1.3.7
+
+# Security
+bcrypt==4.1.2
+argon2-cffi==23.1.0
+
+# Testing (Development)
+pytest==7.4.3
+pytest-cov==4.1.0
+pytest-mock==3.12.0
+pytest-asyncio==0.21.1
+factory-boy==3.3.0
+responses==0.24.1
+
+# Code Quality (Development)
+black==23.11.0
+isort==5.13.0
+flake8==6.1.0
+mypy==1.7.1
+bandit==1.7.5
+
+# Documentation (Development)
+sphinx==7.2.6
+sphinx-rtd-theme==1.3.0
+
+# Performance Profiling
+memory-profiler==0.61.0
+line-profiler==4.1.1
+
+# Kubernetes & Cloud Native
+kubernetes==28.1.0
+
+# File Processing
+mimetype==1.1.0
+magic==0.4.27
+
+# Async Support
+aiohttp==3.9.1
+aiofiles==23.2.1
+
+# Caching
+django-redis-cache==3.0.0
+
+# Message Queue
+pika==1.3.2
+
+# Multiprocessing
+multiprocess==0.70.15
+
+# Enterprise Features
+enterprise-auth-sdk==1.0.0  # Custom enterprise auth package
+hypersearch-cognitive==1.0.0  # Custom cognitive agents package
+hypersearch-monitoring==1.0.0  # Custom monitoring package
