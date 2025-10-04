@@ -40,13 +40,22 @@ HyperSearch AI Platform is an **enterprise-grade, production-ready** AI-powered 
 - **Audit Logging** - Complete audit trail for compliance
 - **Custom Dashboards** - Business-specific KPIs and analytics
 
+#### **🌐 Enterprise Integrations**
+- **Microsoft 365** - Teams, SharePoint, Outlook, OneDrive, Calendar
+- **Google Workspace** - Gmail, Drive, Calendar, Docs, Sheets, Slides
+- **Meta Platforms** - Facebook, Instagram, Threads, WhatsApp Business
+- **GitHub Enterprise** - Repositories, Issues, Actions, Projects, Copilot
+- **Slack & Notion** - Team communication and knowledge management
+- **39+ Services** - Complete enterprise platform coverage
+
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Kubernetes cluster (v1.24+) with 3+ nodes
-- 16+ CPU cores and 64GB+ RAM total
-- 1TB+ persistent storage with SSD performance
-- Load balancer capability and DNS management
+- **Kubernetes cluster** (v1.24+) with 2+ nodes
+- **8+ CPU cores** total across nodes (recommended)
+- **16GB+ RAM** total across nodes (recommended)  
+- **500GB+ persistent storage** with SSD performance
+- **Load balancer** capability and DNS management
 
 ### One-Command Deployment
 ```bash
@@ -97,6 +106,12 @@ graph TB
     DB --> Postgres[(📊 PostgreSQL)]
     DB --> Qdrant[(🔍 Vector DB)]
     DB --> Redis[(⚡ Cache)]
+    
+    API --> Integrations[🌐 Enterprise Integrations]
+    Integrations --> Microsoft[🏢 Microsoft 365]
+    Integrations --> Google[🔍 Google Workspace]
+    Integrations --> Meta[📱 Meta Platforms]
+    Integrations --> GitHub[🐙 GitHub Enterprise]
     
     subgraph Monitoring
         Prometheus[📊 Prometheus] --> Grafana[📈 Grafana]
@@ -175,6 +190,43 @@ SAML_IDP_SSO_URL=https://sso.company.com/adfs/ls/
 - **Scalability**: 1000+ concurrent users supported
 - **Accuracy**: >90% search result relevance
 - **Reliability**: <0.1% error rate
+
+### **System Requirements**
+- **Minimum**: 2 CPU cores, 4GB RAM per node
+- **Recommended**: 8+ CPU cores, 16GB+ RAM total
+- **Storage**: 500GB+ SSD storage with 3000+ IOPS
+- **Network**: Gigabit connectivity recommended
+- **Kubernetes**: v1.24+ with 2+ worker nodes
+
+### **Resource Allocation**
+```yaml
+# Backend API (per replica)
+resources:
+  requests:
+    cpu: 500m
+    memory: 1Gi
+  limits:
+    cpu: 2000m
+    memory: 4Gi
+
+# Frontend UI (per replica)  
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 1Gi
+
+# Databases (per replica)
+resources:
+  requests:
+    cpu: 1000m
+    memory: 2Gi
+  limits:
+    cpu: 4000m
+    memory: 8Gi
+```
 
 ### **Monitoring Dashboards**
 1. **System Overview** - High-level health and performance
