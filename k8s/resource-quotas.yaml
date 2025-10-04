@@ -1,0 +1,123 @@
+# Resource Quotas for optimized 8-core, 16GB deployment
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: hypersearch-compute-quota
+  namespace: hypersearch
+spec:
+  hard:
+    # CPU quotas (optimized for 8-core cluster)
+    requests.cpu: "6"
+    limits.cpu: "14"
+    
+    # Memory quotas (optimized for 16GB cluster)
+    requests.memory: 8Gi
+    limits.memory: 24Gi
+    
+    # Pod and object quotas
+    pods: "20"
+    persistentvolumeclaims: "10"
+    services: "10"
+    secrets: "20"
+    configmaps: "20"
+    
+    # Storage quotas
+    requests.storage: 500Gi
+---
+# Limit Range for resource optimization
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: hypersearch-limits
+  namespace: hypersearch
+spec:
+  limits:
+  - type: Container
+    default:
+      cpu: 500m
+      memory: 1Gi
+    defaultRequest:
+      cpu: 100m
+      memory: 256Mi
+    max:
+      cpu: 4000m
+      memory: 8Gi
+    min:
+      cpu: 50m
+      memory: 128Mi
+  - type: Pod
+    max:
+      cpu: 8000m
+      memory: 16Gi
+  - type: PersistentVolumeClaim
+    min:
+      storage: 1Gi
+    max:
+      storage: 200Gi
+---
+# Horizontal Pod Autoscaler for Backend
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: hypersearch-backend-hpa
+  namespace: hypersearch
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: hypersearch-backend
+  minReplicas: 2
+  maxReplicas: 8
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 60
+      policies:
+      - type: Percent
+        value: 100
+        periodSeconds: 60
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 50
+        periodSeconds: 60
+---
+# Horizontal Pod Autoscaler for Frontend
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: hypersearch-frontend-hpa
+  namespace: hypersearch
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: hypersearch-frontend
+  minReplicas: 2
+  maxReplicas: 6
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80

@@ -54,9 +54,40 @@ spec:
             port: 5000
           initialDelaySeconds: 60
           periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
         readinessProbe:
           httpGet:
             path: /api/health
             port: 5000
           initialDelaySeconds: 30
           periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        # Resource-optimized JVM settings for AI workloads
+        env:
+        - name: JAVA_OPTS
+          value: "-Xmx2g -Xms1g -XX:+UseG1GC -XX:MaxGCPauseMillis=200"
+        - name: PYTHONUNBUFFERED
+          value: "1"
+        - name: OMP_NUM_THREADS
+          value: "2"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hypersearch-backend
+  namespace: hypersearch
+  labels:
+    app: hypersearch-server
+    component: backend
+spec:
+  selector:
+    app: hypersearch-server
+    component: backend
+  ports:
+  - name: http
+    port: 80
+    targetPort: 5000
+    protocol: TCP
+  type: ClusterIP

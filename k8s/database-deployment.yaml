@@ -1,0 +1,267 @@
+# PostgreSQL Database
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: hypersearch-postgres
+  namespace: hypersearch
+  labels:
+    app: hypersearch-database
+    component: postgres
+spec:
+  serviceName: hypersearch-postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hypersearch-database
+      component: postgres
+  template:
+    metadata:
+      labels:
+        app: hypersearch-database
+        component: postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:15-alpine
+        ports:
+        - containerPort: 5432
+          name: postgres
+        envFrom:
+        - configMapRef:
+            name: hypersearch-config
+        - secretRef:
+            name: hypersearch-secrets
+        env:
+        - name: POSTGRES_DB
+          value: hypersearch
+        - name: POSTGRES_USER
+          value: hypersearch
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: hypersearch-secrets
+              key: POSTGRES_PASSWORD
+        resources:
+          requests:
+            cpu: 500m
+            memory: 1Gi
+          limits:
+            cpu: 2000m
+            memory: 4Gi
+        volumeMounts:
+        - name: postgres-data
+          mountPath: /var/lib/postgresql/data
+        livenessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -U
+            - hypersearch
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -U
+            - hypersearch
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 2
+  volumeClaimTemplates:
+  - metadata:
+      name: postgres-data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 50Gi
+      storageClassName: fast-ssd
+---
+# Qdrant Vector Database
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: hypersearch-qdrant
+  namespace: hypersearch
+  labels:
+    app: hypersearch-database
+    component: qdrant
+spec:
+  serviceName: hypersearch-qdrant
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hypersearch-database
+      component: qdrant
+  template:
+    metadata:
+      labels:
+        app: hypersearch-database
+        component: qdrant
+    spec:
+      containers:
+      - name: qdrant
+        image: qdrant/qdrant:v1.7.0
+        ports:
+        - containerPort: 6333
+          name: http
+        - containerPort: 6334
+          name: grpc
+        resources:
+          requests:
+            cpu: 500m
+            memory: 1Gi
+          limits:
+            cpu: 2000m
+            memory: 4Gi
+        volumeMounts:
+        - name: qdrant-data
+          mountPath: /qdrant/storage
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 6333
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /readiness
+            port: 6333
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 2
+  volumeClaimTemplates:
+  - metadata:
+      name: qdrant-data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 100Gi
+      storageClassName: fast-ssd
+---
+# Redis Cache
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hypersearch-redis
+  namespace: hypersearch
+  labels:
+    app: hypersearch-database
+    component: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hypersearch-database
+      component: redis
+  template:
+    metadata:
+      labels:
+        app: hypersearch-database
+        component: redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:7-alpine
+        ports:
+        - containerPort: 6379
+          name: redis
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 1Gi
+        command:
+        - redis-server
+        - --maxmemory
+        - 768mb
+        - --maxmemory-policy
+        - allkeys-lru
+        - --save
+        - 900 1
+        livenessProbe:
+          exec:
+            command:
+            - redis-cli
+            - ping
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          exec:
+            command:
+            - redis-cli
+            - ping
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 2
+---
+# Database Services
+apiVersion: v1
+kind: Service
+metadata:
+  name: hypersearch-postgres
+  namespace: hypersearch
+  labels:
+    app: hypersearch-database
+    component: postgres
+spec:
+  selector:
+    app: hypersearch-database
+    component: postgres
+  ports:
+  - name: postgres
+    port: 5432
+    targetPort: 5432
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hypersearch-qdrant
+  namespace: hypersearch
+  labels:
+    app: hypersearch-database
+    component: qdrant
+spec:
+  selector:
+    app: hypersearch-database
+    component: qdrant
+  ports:
+  - name: http
+    port: 6333
+    targetPort: 6333
+  - name: grpc
+    port: 6334
+    targetPort: 6334
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hypersearch-redis
+  namespace: hypersearch
+  labels:
+    app: hypersearch-database
+    component: redis
+spec:
+  selector:
+    app: hypersearch-database
+    component: redis
+  ports:
+  - name: redis
+    port: 6379
+    targetPort: 6379
+  type: ClusterIP
